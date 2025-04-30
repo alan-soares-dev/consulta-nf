@@ -181,7 +181,7 @@ export default {
           this.$toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'CNPJ não encontrado.',
+            detail: 'CNPJ não encontrado. Tente: 11.111.111/1111-11 ou 22.222.222/2222-22',
             life: 3000,
           })
         }
