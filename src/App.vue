@@ -2,6 +2,31 @@
   <div class="app">
     <h1 class="title">Consulta de NF-e</h1>
 
+    <FileUpload
+      mode="basic"
+      @select="onFileSelect"
+      customUpload
+      auto
+      severity="secondary"
+      class="p-button-outlined"
+    />
+
+    <!-- <input type="file" id="fileInput" />
+    <script>
+      document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0]
+        if (file) {
+          const reader = new FileReader()
+          reader.onload = function (e) {
+            const fileContent = e.target.result
+            console.log('File content:', fileContent)
+            // You can now process the fileContent (e.g., display it, parse it)
+          }
+          reader.readAsText(file) // Or reader.readAsDataURL(file) for images
+        }
+      })
+    </script> -->
+
     <FloatLabel>
       <label for="cnpj" class="font-bold block mb-2">CNPJ</label>
       <InputMask id="cnpj" mask="99.999.999/9999-99" v-model="cnpj" :unmask="true" />
@@ -72,6 +97,7 @@ import DataTable from 'primevue/datatable'
 import FloatLabel from 'primevue/floatlabel'
 import InputMask from 'primevue/inputmask'
 import Toast from 'primevue/toast'
+import FileUpload from 'primevue/fileupload'
 
 export default {
   name: 'App',
@@ -82,6 +108,7 @@ export default {
     DataTable,
     Column,
     Toast,
+    FileUpload,
     Card,
   },
 
@@ -147,6 +174,19 @@ export default {
   },
 
   methods: {
+    onFileSelect(event) {
+      const file = event.files[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const fileContent = e.target.result
+          console.log('File content:', fileContent)
+          // You can now process the fileContent (e.g., display it, parse it)
+        }
+        reader.readAsText(file) // Or reader.readAsDataURL(file) for images
+      }
+    },
+
     consultaNota(nf) {
       this.loading.nota = true
       this.$http
