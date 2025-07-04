@@ -1,15 +1,19 @@
 <template>
   <div class="app">
     <h1 class="title">Consulta de NF-e</h1>
+    <h2 class="subtitle">Verifique as notas fiscais cadastradas para um CNPJ ou se uma determinada nota fiscal já está cadastrada no sistema.</h2>
 
-    <FileUpload
-      mode="basic"
-      @select="onFileSelect"
-      customUpload
-      auto
-      severity="secondary"
-      class="p-button-outlined"
-    />
+    <div class="content">
+      <FileUpload
+        chooseLabel="Consultar Nota Fiscal"
+        mode="basic"
+        @select="onFileSelect"
+        customUpload
+        auto
+        severity="secondary"
+        class="p-button-outlined "
+        style="margin-top: 5em;"
+      />
 
     <!-- <input type="file" id="fileInput" />
     <script>
@@ -27,11 +31,12 @@
       })
     </script> -->
 
-    <FloatLabel>
-      <label for="cnpj" class="font-bold block mb-2">CNPJ</label>
-      <InputMask id="cnpj" mask="99.999.999/9999-99" v-model="cnpj" :unmask="true" />
-      <PrimeButton label="Consultar" class="ml-2" @click="consultarCnpj" :loading="loading.cnpj" />
-    </FloatLabel>
+      <FloatLabel style="margin-top: 5em;">
+        <label for="cnpj" class="font-bold block mb-2">CNPJ</label>
+        <InputMask id="cnpj" mask="99.999.999/9999-99" v-model="cnpj" :unmask="true" />
+        <PrimeButton label="Consultar" class="ml-2" @click="consultarCnpj" :loading="loading.cnpj" />
+      </FloatLabel>
+    </div>
 
     <DataTable v-if="notas" :value="notas" :loading="loading.nota" :loading-text="'Carregando...'">
       <Column field="data" header="Data"></Column>
@@ -180,10 +185,27 @@ export default {
         const reader = new FileReader()
         reader.onload = (e) => {
           const fileContent = e.target.result
-          console.log('File content:', fileContent)
-          // You can now process the fileContent (e.g., display it, parse it)
+          // console.log('File content:', fileContent)
+          // alert(fileContent)
+
+          const xmlContent = new window.DOMParser().parseFromString(fileContent, 'text/xml')
+          const idNfe = (xmlContent.evaluate("nfeProc/NFe/infNFe/id", xmlContent, null, XPathResult.STRING_TYPE, null)).stringValue
+          const cnpjComprador = (xmlContent.evaluate("nfeProc/NFe/infNFe/dest/CNPJ", xmlContent, null, XPathResult.STRING_TYPE, null)).stringValue
+          
+          const n = this.notas_local.find((item) => item.cnpj === cnpjComprador)
+          if (n) {
+            if (n.notas.some(nota => nota['nf'] === idNfe)) {
+              alert("Nota já registrada na base de dados.")
+            } else {
+              alert("Nota não registrada na base de dados.")
+            }
+          } else {
+            alert("CNPJ não registrado na base de dados.")
+          }
+
         }
         reader.readAsText(file) // Or reader.readAsDataURL(file) for images
+
       }
     },
 
@@ -244,4 +266,10 @@ export default {
   text-align: center;
   margin-top: 1em;
 }
+
+.content {
+  display: inline-block;
+}
+
+
 </style>
